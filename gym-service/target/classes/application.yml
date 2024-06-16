@@ -98,7 +98,7 @@ info:
     version: 1.0.0
     java:
       version: 19.0.2
-  build-timestamp: 2024-06-08 23:05:41
+  build-timestamp: 2024-06-16 21:14:03
 ---
 spring:
   config:
@@ -113,7 +113,7 @@ info:
     version: 1.0.0
     java:
       version: 19.0.2
-  build-timestamp: 2024-06-08 23:05:41
+  build-timestamp: 2024-06-16 21:14:03
 ---
 spring:
   config:
@@ -133,7 +133,7 @@ info:
     version: 1.0.0
     java:
       version: 19.0.2
-  build-timestamp: 2024-06-08 23:05:41
+  build-timestamp: 2024-06-16 21:14:03
 
 ---
 spring:

@@ -3,7 +3,7 @@ package com.epam.trainingservice.service;
 import com.epam.trainingservice.config.LogEntryExit;
 import com.epam.trainingservice.dto.TrainerSummary;
 import com.epam.trainingservice.entity.Summary;
-import com.epam.trainingservice.repository.SummaryRepo;
+import com.epam.trainingservice.repository.SummaryRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +11,10 @@ import java.util.Objects;
 
 @Service
 public class SummaryService {
-    private final SummaryRepo summaryRepository;
+    private final SummaryRepository summaryRepository;
     private final WorkloadService workloadService;
 
-    public SummaryService(SummaryRepo summaryRepository, WorkloadService workloadService) {
+    public SummaryService(SummaryRepository summaryRepository, WorkloadService workloadService) {
         this.summaryRepository = summaryRepository;
         this.workloadService = workloadService;
     }
