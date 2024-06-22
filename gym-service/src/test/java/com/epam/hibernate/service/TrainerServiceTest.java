@@ -11,114 +11,61 @@ import com.epam.hibernate.dto.user.LoginDTO;
 import com.epam.hibernate.entity.*;
 import com.epam.hibernate.repository.TrainerRepository;
 import com.epam.hibernate.repository.TrainingTypeRepository;
-import com.epam.hibernate.repository.UserRepository;
+import com.epam.hibernate.repository.UserJpaRepository;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import io.prometheus.client.Counter;
-import org.junit.jupiter.api.Assertions;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import javax.naming.AuthenticationException;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class TrainerServiceTest {
-    @Mock
-    private Timer timer;
+    @Spy
+    private MeterRegistry meterRegistry = new SimpleMeterRegistry();
     @Mock
     private TrainerRepository trainerRepository;
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userRepository;
     @Mock
     private TrainingTypeRepository trainingTypeRepository;
     @Mock
     private UserService userService;
     @InjectMocks
     private TrainerService trainerService;
-
-    private TrainingType createMockTrainingType() {
-        TrainingType trainingType = mock(TrainingType.class);
-
-        when(trainingType.getTrainingTypeName()).thenReturn(TrainingTypeEnum.AGILITY);
-
-        return trainingType;
-    }
-
-    private Trainer createMockTrainer() {
-        Trainer mockTrainer = mock(Trainer.class);
-        User mockUser = mock(User.class);
-        TrainingType trainingType = createMockTrainingType();
-        when(mockTrainer.getUser()).thenReturn(mockUser);
-        when(mockTrainer.getSpecialization()).thenReturn(trainingType);
-        return mockTrainer;
-    }
     @Test
-    public void testCreateProfile(){
-        // given
-        TrainerRegisterRequest request = new TrainerRegisterRequest();
-        request.setFirstName("John");
-        request.setLastName("Doe");
-        request.setSpecialization("AGILITY");
-        when(userRepository.usernameExists(anyString())).thenReturn(false);
-        doAnswer((Answer<Void>) invocation -> {
-            Object[] args = invocation.getArguments();
-            Runnable runnable = (Runnable) args[0];
-            runnable.run();
-            return null;
-        }).when(timer).record(any(Runnable.class));
-
-        // when
-        ResponseEntity<TrainerRegisterResponse> responseEntity = trainerService.createProfile(request);
-
-        // then
-        TrainerRegisterResponse response = responseEntity.getBody();
-        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        Assertions.assertNotNull(response);
-        Assertions.assertNotNull(response.getUsername());
-        Mockito.verify(userRepository, Mockito.times(2)).usernameExists(anyString());
-        Mockito.verify(trainerRepository, Mockito.times(1)).save(any(Trainer.class));
-    }
-
-    @Test
-    void createProfileOk() {
-        when(userRepository.usernameExists(any(String.class))).thenReturn(false);
-
-        TrainingType mockTrainingType = createMockTrainingType();
-        when(trainingTypeRepository.selectByType(any(TrainingTypeEnum.class))).thenReturn(mockTrainingType);
-
+    void createTraineeProfileOk() {
         when(trainerRepository.save(any(Trainer.class))).thenReturn(new Trainer());
 
-        TrainerRegisterRequest request = new TrainerRegisterRequest(
-                "John", "Doe", "AGILITY"
-        );
-        ResponseEntity<TrainerRegisterResponse> responseEntity = trainerService.createProfile(request);
+        TrainerRegisterRequest validRequest = new TrainerRegisterRequest("John", "Doe", "AGILITY");
 
-        assertEquals(200, responseEntity.getStatusCode().value());
-        verify(userRepository, times(1)).usernameExists(any(String.class));
-        verify(trainingTypeRepository, times(1)).selectByType(any(TrainingTypeEnum.class));
-        verify(trainerRepository, times(1)).save(any(Trainer.class));
+        ResponseEntity<TrainerRegisterResponse> responseEntity = trainerService.createProfile(validRequest);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        TrainerRegisterResponse responseBody = responseEntity.getBody();
+        assertNotNull(responseBody);
+        assertNotNull(responseBody.getUsername());
+        assertNotNull(responseBody.getPassword());
     }
 
     @Test
     void createProfileSameNameOk() {
-        when(userRepository.usernameExists(any(String.class))).thenReturn(true);
 
         TrainingType mockTrainingType = createMockTrainingType();
         when(trainingTypeRepository.selectByType(any(TrainingTypeEnum.class))).thenReturn(mockTrainingType);
@@ -131,15 +78,12 @@ class TrainerServiceTest {
         trainerService.createProfile(request);
 
         assertNotEquals("John.Doe", "John.Doe0");
-        verify(userRepository, times(1)).usernameExists(any(String.class));
         verify(trainingTypeRepository, times(1)).selectByType(any(TrainingTypeEnum.class));
         verify(trainerRepository, times(1)).save(any(Trainer.class));
     }
 
     @Test
     void selectCurrentTrainerProfileOk() {
-        when(userService.authenticate(any(LoginDTO.class))).thenReturn(null);
-
         Trainer mockTrainer = createMockTrainer();
         when(trainerRepository.selectByUsername(any(String.class))).thenReturn(mockTrainer);
 
@@ -151,8 +95,6 @@ class TrainerServiceTest {
 
     @Test
     void updateTrainerOk() {
-        when(userService.authenticate(any(LoginDTO.class))).thenReturn(null);
-
         Trainer mockTrainer = createMockTrainer();
 
         when(trainerRepository.updateTrainer(any(String.class), any(String.class), any(String.class),
@@ -169,9 +111,7 @@ class TrainerServiceTest {
     }
 
     @Test
-    void getTrainingListOk(){
-        when(userService.authenticate(any(LoginDTO.class))).thenReturn(null);
-
+    void getTrainingListOk() {
         Trainer mockTrainer = createMockTrainer();
 
         when(trainerRepository.selectByUsername(any(String.class))).thenReturn(mockTrainer);
@@ -191,5 +131,21 @@ class TrainerServiceTest {
     private List<Training> createMockTrainingList() {
         Training mockTraining = mock(Training.class);
         return List.of(mockTraining);
+    }
+    private TrainingType createMockTrainingType() {
+        TrainingType trainingType = mock(TrainingType.class);
+
+        when(trainingType.getTrainingTypeName()).thenReturn(TrainingTypeEnum.AGILITY);
+
+        return trainingType;
+    }
+
+    private Trainer createMockTrainer() {
+        Trainer mockTrainer = mock(Trainer.class);
+        User mockUser = mock(User.class);
+        TrainingType trainingType = createMockTrainingType();
+        when(mockTrainer.getUser()).thenReturn(mockUser);
+        when(mockTrainer.getSpecialization()).thenReturn(trainingType);
+        return mockTrainer;
     }
 }

@@ -93,10 +93,6 @@ public class Trainer {
 
     @Override
     public String toString() {
-        return "Trainer{" +
-                "trainerId=" + trainerId +
-                ", specialization=" + specialization +
-                ", user=" + user +
-                '}';
+        return "Trainer{" + "trainerId=" + trainerId + ", specialization=" + specialization + ", user=" + user + '}';
     }
 }

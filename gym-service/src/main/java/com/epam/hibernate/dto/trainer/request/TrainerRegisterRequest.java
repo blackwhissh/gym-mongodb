@@ -1,6 +1,5 @@
 package com.epam.hibernate.dto.trainer.request;
 
-import com.epam.hibernate.entity.TrainingTypeEnum;
 import org.jetbrains.annotations.NotNull;
 
 public class TrainerRegisterRequest {

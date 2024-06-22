@@ -20,6 +20,54 @@ import java.util.*;
 public class LogEntryExitAspect {
     static String id;
 
+    static String entry(String methodName, boolean showArgs, String[] params, Object[] args) {
+        id = generateId().substring(0, 8);
+        StringJoiner message = new StringJoiner(" ").add(id + "   ").add("Started").add(methodName).add("method");
+
+        if (showArgs && Objects.nonNull(params) && Objects.nonNull(args) && params.length == args.length) {
+
+            Map<String, Object> values = new HashMap<>(params.length);
+
+            for (int i = 0; i < params.length; i++) {
+                values.put(params[i], args[i]);
+            }
+
+            message.add("with args:").add(values.toString());
+        }
+
+        return message.toString();
+    }
+
+    static String exit(String methodName, String duration, Object result, boolean showResult, boolean showExecutionTime) {
+        StringJoiner message = new StringJoiner(" ").add(id + "   ").add("Finished").add(methodName).add("method");
+
+        if (showExecutionTime) {
+            message.add("in").add(duration);
+        }
+
+        if (showResult) {
+
+            message.add("with return:").add(result.toString());
+        }
+
+        return message.toString();
+    }
+
+    static void log(Logger logger, LogLevel level, String message) {
+        switch (level) {
+            case DEBUG -> logger.debug(message);
+            case TRACE -> logger.trace(message);
+            case WARN -> logger.warn(message);
+            case ERROR, FATAL -> logger.error(message);
+            default -> logger.info(message);
+        }
+    }
+
+    static String generateId() {
+
+        return "ID " + UUID.randomUUID().toString().substring(0, 8);
+    }
+
     @Around("@annotation(com.epam.hibernate.config.LogEntryExit)")
     public Object log(ProceedingJoinPoint point) throws Throwable {
         var codeSignature = (CodeSignature) point.getSignature();
@@ -48,56 +96,5 @@ public class LogEntryExitAspect {
         log(logger, level, exit(methodName, duration, response, showResult, showExecutionTime));
 
         return response;
-    }
-
-    static String entry(String methodName, boolean showArgs, String[] params, Object[] args) {
-        id = generateId().substring(0,8);
-        StringJoiner message = new StringJoiner(" ").add(id + "   ")
-                .add("Started").add(methodName).add("method");
-
-        if (showArgs && Objects.nonNull(params) && Objects.nonNull(args) && params.length == args.length) {
-
-            Map<String, Object> values = new HashMap<>(params.length);
-
-            for (int i = 0; i < params.length; i++) {
-                values.put(params[i], args[i]);
-            }
-
-            message.add("with args:")
-                    .add(values.toString());
-        }
-
-        return message.toString();
-    }
-
-    static String exit(String methodName, String duration, Object result, boolean showResult, boolean showExecutionTime) {
-        StringJoiner message = new StringJoiner(" ").add(id + "   ")
-                .add("Finished").add(methodName).add("method");
-
-        if (showExecutionTime) {
-            message.add("in").add(duration);
-        }
-
-        if (showResult) {
-
-            message.add("with return:").add(result.toString());
-        }
-
-        return message.toString();
-    }
-
-    static void log(Logger logger, LogLevel level, String message) {
-        switch (level) {
-            case DEBUG -> logger.debug(message);
-            case TRACE -> logger.trace(message);
-            case WARN -> logger.warn(message);
-            case ERROR, FATAL -> logger.error(message);
-            default -> logger.info(message);
-        }
-    }
-
-    static String generateId(){
-
-        return "ID " +UUID.randomUUID().toString().substring(0,8);
     }
 }

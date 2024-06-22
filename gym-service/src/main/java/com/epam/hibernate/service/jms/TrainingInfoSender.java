@@ -1,13 +1,15 @@
 package com.epam.hibernate.service.jms;
 
-import com.epam.hibernate.dto.TrainingInfoRequest;
+import com.epam.hibernate.dto.TrainingInfoMessage;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TrainingInfoSender {
-    private static final String TRAINING_INFO_QUEUE = "training.info.queue";
+    @Value("${spring.activemq.queue}")
+    private String TRAINING_INFO_QUEUE;
     private final JmsTemplate jmsTemplate;
 
     public TrainingInfoSender(JmsTemplate jmsTemplate) {
@@ -15,7 +17,7 @@ public class TrainingInfoSender {
     }
 
     @Transactional
-    public void send(TrainingInfoRequest request) {
+    public void send(TrainingInfoMessage request) {
         jmsTemplate.convertAndSend(TRAINING_INFO_QUEUE, request);
     }
 }

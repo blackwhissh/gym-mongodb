@@ -33,20 +33,19 @@ public class TraineeService {
     private final TraineeRepository traineeRepository;
     private final UserJpaRepository userRepository;
     private final TrainerRepository trainerRepository;
+
     @Autowired
     public TraineeService(MeterRegistry meterRegistry, TraineeRepository traineeRepository, UserJpaRepository userRepository, TrainerRepository trainerRepository) {
         this.traineeRepository = traineeRepository;
         this.userRepository = userRepository;
         this.trainerRepository = trainerRepository;
-        this.timer = Timer.builder("trainee_register_timer")
-                .description("Times Registering Trainee")
-                .register(meterRegistry);
+        this.timer = Timer.builder("trainee_register_timer").description("Times Registering Trainee").register(meterRegistry);
     }
 
     public ResponseEntity<TraineeRegisterResponse> createProfile(@NotNull TraineeRegisterRequest request) {
         User traineeUser = new User(request.getFirstName(), request.getLastName(), true, RoleEnum.TRAINEE);
         timer.record(() -> {
-            if (!userRepository.existsByUsername(generateUsername(traineeUser.getFirstName(), traineeUser.getLastName(), false))) {
+            if (userRepository.existsByUsername(generateUsername(traineeUser.getFirstName(), traineeUser.getLastName(), false))) {
                 traineeUser.setUsername(generateUsername(traineeUser.getFirstName(), traineeUser.getLastName(), false));
             } else {
                 traineeUser.setUsername(generateUsername(traineeUser.getFirstName(), traineeUser.getLastName(), true));
@@ -61,39 +60,13 @@ public class TraineeService {
     public ResponseEntity<TraineeProfileResponse> selectTraineeProfile(String username) {
         Trainee trainee = traineeRepository.selectByUsername(username);
 
-        return ResponseEntity.ok().body(new TraineeProfileResponse(
-                trainee.getUser().getFirstName(),
-                trainee.getUser().getLastName(),
-                trainee.getDob(),
-                trainee.getAddress(),
-                trainee.getUser().getActive(),
-                trainee.getTrainers().stream().map(trainer -> new TrainerListInfo(
-                        trainer.getUser().getUsername(),
-                        trainer.getUser().getFirstName(),
-                        trainer.getUser().getLastName(),
-                        trainer.getSpecialization()
-                )).collect(Collectors.toSet())));
+        return ResponseEntity.ok().body(new TraineeProfileResponse(trainee.getUser().getFirstName(), trainee.getUser().getLastName(), trainee.getDob(), trainee.getAddress(), trainee.getUser().getActive(), trainee.getTrainers().stream().map(trainer -> new TrainerListInfo(trainer.getUser().getUsername(), trainer.getUser().getFirstName(), trainer.getUser().getLastName(), trainer.getSpecialization())).collect(Collectors.toSet())));
     }
 
-    public ResponseEntity<UpdateTraineeResponse> updateTrainee(@NotNull String username,
-                                                               @NotNull UpdateTraineeRequest request) {
-        Trainee trainee = traineeRepository.updateTrainee(username, request.getDob(), request.getAddress(),
-                request.getFirstName(), request.getLastName(), request.getActive());
+    public ResponseEntity<UpdateTraineeResponse> updateTrainee(@NotNull String username, @NotNull UpdateTraineeRequest request) {
+        Trainee trainee = traineeRepository.updateTrainee(username, request.getDob(), request.getAddress(), request.getFirstName(), request.getLastName(), request.getActive());
 
-        return ResponseEntity.ok().body(new UpdateTraineeResponse(
-                trainee.getUser().getUsername(),
-                trainee.getUser().getFirstName(),
-                trainee.getUser().getLastName(),
-                trainee.getDob(),
-                trainee.getAddress(),
-                trainee.getUser().getActive(),
-                trainee.getTrainers().stream().map(trainer -> new TrainerListInfo(
-                        trainer.getUser().getUsername(),
-                        trainer.getUser().getFirstName(),
-                        trainer.getUser().getLastName(),
-                        trainer.getSpecialization()
-                )).collect(Collectors.toSet())
-        ));
+        return ResponseEntity.ok().body(new UpdateTraineeResponse(trainee.getUser().getUsername(), trainee.getUser().getFirstName(), trainee.getUser().getLastName(), trainee.getDob(), trainee.getAddress(), trainee.getUser().getActive(), trainee.getTrainers().stream().map(trainer -> new TrainerListInfo(trainer.getUser().getUsername(), trainer.getUser().getFirstName(), trainer.getUser().getLastName(), trainer.getSpecialization())).collect(Collectors.toSet())));
     }
 
     @Transactional
@@ -103,16 +76,8 @@ public class TraineeService {
 
     @Transactional
     public ResponseEntity<List<TraineeTrainingsResponse>> getTrainingList(@NotNull String username, @NotNull TraineeTrainingsRequest request) {
-        List<Training> trainingList = traineeRepository.getTrainingList(username,
-                request.getFrom(), request.getTo(), request.getTrainerName(),
-                request.getTrainingType());
-        return ResponseEntity.ok(trainingList.stream().map(training -> new TraineeTrainingsResponse(
-                training.getTrainingName(),
-                training.getTrainingDate(),
-                training.getTrainingType(),
-                training.getTrainingDuration(),
-                training.getTrainer().getUser().getFirstName()
-        )).toList());
+        List<Training> trainingList = traineeRepository.getTrainingList(username, request.getFrom(), request.getTo(), request.getTrainerName(), request.getTrainingType());
+        return ResponseEntity.ok(trainingList.stream().map(training -> new TraineeTrainingsResponse(training.getTrainingName(), training.getTrainingDate(), training.getTrainingType(), training.getTrainingDuration(), training.getTrainer().getUser().getFirstName())).toList());
     }
 
     @Transactional
@@ -125,46 +90,33 @@ public class TraineeService {
                 notAssignedTrainers.add(trainer);
             }
         }
-        return ResponseEntity.ok().body(
-                notAssignedTrainers.stream().map(trainer -> new NotAssignedTrainer(
-                        trainer.getUser().getUsername(),
-                        trainer.getUser().getFirstName(),
-                        trainer.getUser().getLastName(),
-                        trainer.getSpecialization()
-                )).toList());
+        return ResponseEntity.ok().body(notAssignedTrainers.stream().map(trainer -> new NotAssignedTrainer(trainer.getUser().getUsername(), trainer.getUser().getFirstName(), trainer.getUser().getLastName(), trainer.getSpecialization())).toList());
     }
 
-//    public List<Trainer> assignedTrainersList(@NotNull User currentUser, @NotNull String traineeUsername) throws AuthenticationException {
-//        userRepository.authenticate(currentUser.getUsername(), currentUser.getPassword());
-//        Trainee trainee = traineeRepository.selectByUsername(traineeUsername);
-//        List<Trainer> allTrainers = trainerRepository.getAllTrainers();
-//        List<Trainer> assignedTrainers = new ArrayList<>();
-//        for (Trainer trainer : allTrainers) {
-//            if (trainer.getTrainees().contains(trainee)) {
-//                assignedTrainers.add(trainer);
-//            }
-//        }
-//        return assignedTrainers;
-//    }
+    public List<Trainer> assignedTrainersList(@NotNull User currentUser, @NotNull String traineeUsername) throws AuthenticationException {
+        Trainee trainee = traineeRepository.selectByUsername(traineeUsername);
+        List<Trainer> allTrainers = trainerRepository.getAllTrainers();
+        List<Trainer> assignedTrainers = new ArrayList<>();
+        for (Trainer trainer : allTrainers) {
+            if (trainer.getTrainees().contains(trainee)) {
+                assignedTrainers.add(trainer);
+            }
+        }
+        return assignedTrainers;
+    }
 
     @Transactional
     public ResponseEntity<List<TrainerListInfo>> updateTrainersList(String username, UpdateTrainersListRequest request) {
         Trainee trainee = traineeRepository.selectByUsername(username);
 
         Set<String> trainersSet = request.getTrainers();
-        Set<Trainer> trainers = trainersSet.stream().map(trainerRepository::selectByUsername)
-                .collect(Collectors.toSet());
+        Set<Trainer> trainers = trainersSet.stream().map(trainerRepository::selectByUsername).collect(Collectors.toSet());
         trainers.forEach(trainer -> {
             if (!trainer.getUser().getActive()) throw new UserInactiveException("Trainer is inactive");
         });
         trainee.setTrainers(trainers);
         traineeRepository.save(trainee);
 
-        return ResponseEntity.ok().body(trainers.stream().map(trainer -> new TrainerListInfo(
-                trainer.getUser().getUsername(),
-                trainer.getUser().getFirstName(),
-                trainer.getUser().getLastName(),
-                trainer.getSpecialization()
-        )).toList());
+        return ResponseEntity.ok().body(trainers.stream().map(trainer -> new TrainerListInfo(trainer.getUser().getUsername(), trainer.getUser().getFirstName(), trainer.getUser().getLastName(), trainer.getSpecialization())).toList());
     }
 }

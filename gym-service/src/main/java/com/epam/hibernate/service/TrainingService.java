@@ -1,7 +1,8 @@
 package com.epam.hibernate.service;
 
+import com.epam.hibernate.dto.ActionType;
 import com.epam.hibernate.dto.AddTrainingRequest;
-import com.epam.hibernate.dto.TrainingInfoRequest;
+import com.epam.hibernate.dto.TrainingInfoMessage;
 import com.epam.hibernate.entity.Trainee;
 import com.epam.hibernate.entity.Trainer;
 import com.epam.hibernate.entity.Training;
@@ -30,10 +31,7 @@ public class TrainingService {
     private final TrainingRepository trainingRepository;
 
     @Autowired
-    public TrainingService(TrainerRepository trainerRepository,
-                           TraineeRepository traineeRepository,
-                           TrainingTypeRepository trainingTypeRepository,
-                           TrainingInfoSender trainingInfoSender, TrainingRepository trainingRepository) {
+    public TrainingService(TrainerRepository trainerRepository, TraineeRepository traineeRepository, TrainingTypeRepository trainingTypeRepository, TrainingInfoSender trainingInfoSender, TrainingRepository trainingRepository) {
         this.trainerRepository = trainerRepository;
         this.traineeRepository = traineeRepository;
         this.trainingTypeRepository = trainingTypeRepository;
@@ -54,8 +52,7 @@ public class TrainingService {
             throw new IllegalArgumentException("Trainer has not that specialization");
         }
 
-        Training training = new Training(trainer, trainee, request.getTrainingName(),
-                trainingType, request.getTrainingDate(), request.getDuration());
+        Training training = new Training(trainer, trainee, request.getTrainingName(), trainingType, request.getTrainingDate(), request.getDuration());
 
         trainer.getTrainings().add(training);
         trainer.getTrainees().add(trainee);
@@ -66,14 +63,11 @@ public class TrainingService {
         trainerRepository.save(trainer);
         traineeRepository.save(trainee);
 
-        trainingInfoSender.send(new TrainingInfoRequest(
-                training.getTrainer().getUser().getUsername(),
+        trainingInfoSender.send(new TrainingInfoMessage(training.getTrainer().getUser().getUsername(),
                 training.getTrainer().getUser().getFirstName(),
-                training.getTrainer().getUser().getLastName(),
-                training.getTrainer().getUser().getActive(),
-                training.getTrainingDate(),
-                training.getTrainingDuration(),
-                "ADD"));
+                training.getTrainer().getUser().getLastName(), training.getTrainer().getUser().getActive(),
+                training.getTrainingDate(), training.getTrainingDuration(),
+                ActionType.ADD));
         return ResponseEntity.status(200).body("Training added successfully");
     }
 
@@ -87,14 +81,11 @@ public class TrainingService {
             throw new TrainingNotFoundException();
         }
         trainingRepository.delete(trainingId);
-        trainingInfoSender.send(new TrainingInfoRequest(
-                training.getTrainer().getUser().getUsername(),
+        trainingInfoSender.send(new TrainingInfoMessage(training.getTrainer().getUser().getUsername(),
                 training.getTrainer().getUser().getFirstName(),
                 training.getTrainer().getUser().getLastName(),
-                training.getTrainer().getUser().getActive(),
-                training.getTrainingDate(),
-                training.getTrainingDuration(),
-                "CANCEL"));
+                training.getTrainer().getUser().getActive(), training.getTrainingDate(),
+                training.getTrainingDuration(), ActionType.CANCEL));
         return ResponseEntity.ok("Training removed successfully");
     }
 }

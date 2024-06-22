@@ -20,9 +20,9 @@ import java.util.logging.Logger;
 @Repository
 public class TraineeRepository {
     public static final Logger logger = Logger.getLogger(TrainerRepository.class.getName());
+    private final TrainingTypeRepository trainingTypeRepository;
     @PersistenceContext
     private EntityManager entityManager;
-    private final TrainingTypeRepository trainingTypeRepository;
 
     public TraineeRepository(TrainingTypeRepository trainingTypeRepository) {
         this.trainingTypeRepository = trainingTypeRepository;
@@ -39,7 +39,7 @@ public class TraineeRepository {
                 .setParameter("username", username)
                 .getSingleResult();
 
-        if(trainee == null){
+        if (trainee == null) {
             logger.warning("User not found");
             throw new EntityNotFoundException("Wrong username - " + username);
         }
@@ -109,7 +109,7 @@ public class TraineeRepository {
     public List<Training> getTrainingList(String traineeUsername, Date fromDate, Date toDate,
                                           String trainerName, TrainingTypeEnum trainingTypeEnum) {
         List<TrainingTypeEnum> types = Arrays.stream(TrainingTypeEnum.values()).toList();
-        if (!types.contains(trainingTypeEnum)){
+        if (!types.contains(trainingTypeEnum)) {
             throw new TrainingTypeEnumNotFoundException();
         }
         TrainingType trainingTypeName = null;

@@ -25,15 +25,10 @@ public class Trainee {
     @JoinColumn(name = "user_id")
     private User user;
     @OneToMany(mappedBy = "trainee", orphanRemoval = true, fetch = FetchType.EAGER)
-    @Cascade({org.hibernate.annotations.CascadeType.ALL,
-            org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL, org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
     private List<Training> trainings = new ArrayList<>();
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "trainee_trainer_mapping",
-            joinColumns = @JoinColumn(name = "trainee_id"),
-            inverseJoinColumns = @JoinColumn(name = "trainer_id")
-    )
+    @JoinTable(name = "trainee_trainer_mapping", joinColumns = @JoinColumn(name = "trainee_id"), inverseJoinColumns = @JoinColumn(name = "trainer_id"))
     private Set<Trainer> trainers = new HashSet<>();
 
     public Trainee() {
@@ -116,13 +111,7 @@ public class Trainee {
 
     @Override
     public String toString() {
-        return "Trainee{" +
-                "traineeId=" + traineeId +
-                ", dob=" + dob +
-                ", address='" + address + '\'' +
-                ", user=" + user +
-                ", trainings=" + trainings +
-                '}';
+        return "Trainee{" + "traineeId=" + traineeId + ", dob=" + dob + ", address='" + address + '\'' + ", user=" + user + ", trainings=" + trainings + '}';
     }
 
 }

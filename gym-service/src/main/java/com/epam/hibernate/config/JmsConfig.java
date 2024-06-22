@@ -5,13 +5,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
-import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableJms
@@ -24,28 +22,33 @@ public class JmsConfig {
     private String user;
     @Value("${spring.activemq.password}")
     private String password;
-
+    @Value("${spring.activemq.clientId}")
+    private String clientId;
+    @Value("${spring.activemq.typeId}")
+    private String typeId;
 
     @Bean
-    public SingleConnectionFactory connectionFactory(){
+    public SingleConnectionFactory connectionFactory() {
         SingleConnectionFactory factory = new SingleConnectionFactory(
                 new ActiveMQConnectionFactory(
-                    user,password,brokerUrl
+                        user, password, brokerUrl
                 )
         );
-        factory.setClientId("gym");
+        factory.setClientId(clientId);
         factory.setReconnectOnException(true);
         return factory;
     }
+
     @Bean
-    public MessageConverter jacksonJmsMessageConverter(){
+    public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
-        converter.setTypeIdPropertyName("_type");
+        converter.setTypeIdPropertyName(typeId);
         return converter;
     }
+
     @Bean
-    public JmsTemplate jmsTemplate(){
+    public JmsTemplate jmsTemplate() {
         JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory());
         jmsTemplate.setMessageConverter(jacksonJmsMessageConverter());
         jmsTemplate.setDeliveryPersistent(true);

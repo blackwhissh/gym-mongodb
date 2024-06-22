@@ -7,7 +7,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Repository
@@ -23,15 +22,16 @@ public class TrainingRepository {
         return training;
     }
 
-    public Training findById(Long trainingId){
-        try{
+    public Training findById(Long trainingId) {
+        try {
             return entityManager.find(Training.class, trainingId);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new EntityNotFoundException(e);
         }
     }
+
     @Transactional
-    public void delete(Long trainingId){
+    public void delete(Long trainingId) {
         entityManager.createQuery("delete from Training where trainingId =: trainingId")
                 .setParameter("trainingId", trainingId)
                 .executeUpdate();

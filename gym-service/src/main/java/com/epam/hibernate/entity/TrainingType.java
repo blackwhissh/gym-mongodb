@@ -39,9 +39,6 @@ public class TrainingType {
 
     @Override
     public String toString() {
-        return "TrainingType{" +
-                "trainingTypeId=" + trainingTypeId +
-                ", trainingTypeName=" + trainingTypeName +
-                '}';
+        return "TrainingType{" + "trainingTypeId=" + trainingTypeId + ", trainingTypeName=" + trainingTypeName + '}';
     }
 }

@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 @Repository
 public class TrainerRepository {
     private static final Logger logger = Logger.getLogger(TrainerRepository.class.getName());
+    private final TrainingTypeRepository trainingTypeRepository;
     @PersistenceContext
     private EntityManager entityManager;
-    private final TrainingTypeRepository trainingTypeRepository;
 
     public TrainerRepository(TrainingTypeRepository trainingTypeRepository) {
         this.trainingTypeRepository = trainingTypeRepository;

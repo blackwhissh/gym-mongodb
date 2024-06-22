@@ -102,14 +102,6 @@ public class Training {
 
     @Override
     public String toString() {
-        return "Training{" +
-                "trainingId=" + trainingId +
-                ", trainer=" + trainer.getTrainerId() +
-                ", trainee=" + trainee.getTraineeId() +
-                ", trainingName='" + trainingName + '\'' +
-                ", trainingType=" + trainingType.getTrainingTypeName() +
-                ", trainingDate=" + trainingDate +
-                ", trainingDuration=" + trainingDuration +
-                '}';
+        return "Training{" + "trainingId=" + trainingId + ", trainer=" + trainer.getTrainerId() + ", trainee=" + trainee.getTraineeId() + ", trainingName='" + trainingName + '\'' + ", trainingType=" + trainingType.getTrainingTypeName() + ", trainingDate=" + trainingDate + ", trainingDuration=" + trainingDuration + '}';
     }
 }

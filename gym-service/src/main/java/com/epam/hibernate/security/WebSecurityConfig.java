@@ -32,19 +32,21 @@ public class WebSecurityConfig {
                         httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/v1/register/**", "/actuator/**", "/swagger-ui/**",
-                                        "/swagger-ui.html","/v3/api-docs/**").permitAll()
+                                        "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
-                        );
+                );
 
         http.addFilterBefore(new JWTAuthorizationFilter(authenticationManager(new AuthenticationConfiguration()), jwtUtils),
                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();

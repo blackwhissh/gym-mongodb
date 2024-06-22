@@ -5,7 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
-public class TrainingInfoRequest {
+public class TrainingInfoMessage {
     private String username;
     private String firstName;
     private String lastName;
@@ -14,9 +14,10 @@ public class TrainingInfoRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date trainingDate;
     private Integer duration;
-    private String actionType;
+    private ActionType actionType;
 
-    public TrainingInfoRequest(String username, String firstName, String lastName, Boolean isActive, Date trainingDate, Integer duration, String actionType) {
+
+    public TrainingInfoMessage(String username, String firstName, String lastName, Boolean isActive, Date trainingDate, Integer duration, ActionType actionType) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -74,11 +75,11 @@ public class TrainingInfoRequest {
         this.duration = duration;
     }
 
-    public String getActionType() {
+    public ActionType getActionType() {
         return actionType;
     }
 
-    public void setActionType(String actionType) {
+    public void setActionType(ActionType actionType) {
         this.actionType = actionType;
     }
 }

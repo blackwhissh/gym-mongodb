@@ -6,10 +6,14 @@ import com.epam.hibernate.entity.*;
 import com.epam.hibernate.repository.TraineeRepository;
 import com.epam.hibernate.repository.TrainerRepository;
 import com.epam.hibernate.repository.TrainingTypeRepository;
+import com.epam.hibernate.service.jms.TrainingInfoSender;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
@@ -25,8 +29,12 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingServiceTest {
+    @Spy
+    private MeterRegistry meterRegistry = new SimpleMeterRegistry();
     @Mock
     private TrainerRepository trainerRepository;
+    @Mock
+    private TrainingInfoSender trainingInfoSender;
     @Mock
     private TraineeRepository traineeRepository;
     @Mock
@@ -36,29 +44,8 @@ class TrainingServiceTest {
     @InjectMocks
     private TrainingService trainingService;
 
-    private Trainee createMockTrainee() {
-        Trainee mockTrainee = mock(Trainee.class);
-        User mockUser = mock(User.class);
-
-        when(mockTrainee.getUser()).thenReturn(mockUser);
-        when(mockUser.getActive()).thenReturn(true);
-        return mockTrainee;
-    }
-
-    private Trainer createMockTrainer() {
-        Trainer mockTrainer = mock(Trainer.class);
-        User mockUser = mock(User.class);
-
-        when(mockTrainer.getUser()).thenReturn(mockUser);
-        when(mockUser.getActive()).thenReturn(true);
-
-        return mockTrainer;
-    }
-
     @Test
-    void addTrainingOk() throws AuthenticationException, NotActiveException, AccessDeniedException {
-        when(userService.authenticate(any(LoginDTO.class))).thenReturn(null);
-
+    void addTrainingOk() throws NotActiveException {
         Trainee mockTrainee = createMockTrainee();
         Trainer mockTrainer = createMockTrainer();
         when(traineeRepository.selectByUsername(any(String.class))).thenReturn(mockTrainee);
@@ -88,6 +75,24 @@ class TrainingServiceTest {
         when(mockTrainingType.getTrainingTypeName()).thenReturn(TrainingTypeEnum.AGILITY);
 
         return mockTrainingType;
+    }
+    private Trainee createMockTrainee() {
+        Trainee mockTrainee = mock(Trainee.class);
+        User mockUser = mock(User.class);
+
+        when(mockTrainee.getUser()).thenReturn(mockUser);
+        when(mockUser.getActive()).thenReturn(true);
+        return mockTrainee;
+    }
+
+    private Trainer createMockTrainer() {
+        Trainer mockTrainer = mock(Trainer.class);
+        User mockUser = mock(User.class);
+
+        when(mockTrainer.getUser()).thenReturn(mockUser);
+        when(mockUser.getActive()).thenReturn(true);
+
+        return mockTrainer;
     }
 
 
