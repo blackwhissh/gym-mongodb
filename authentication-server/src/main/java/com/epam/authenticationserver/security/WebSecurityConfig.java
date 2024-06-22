@@ -41,7 +41,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll()
                                 .requestMatchers("/error", "/v1/user/login/**", "/swagger-ui/**",
-                                        "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                                        "/swagger-ui.html", "/v3/api-docs/**", "/v1/user/refresh/**").permitAll()
                                 .anyRequest().authenticated()
                 );
 

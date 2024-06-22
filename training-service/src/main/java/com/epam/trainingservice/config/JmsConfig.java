@@ -26,6 +26,10 @@ public class JmsConfig {
     private String user;
     @Value("${spring.activemq.password}")
     private String password;
+    @Value("${spring.activemq.clientId}")
+    private String clientId;
+    @Value("${spring.activemq.type}")
+    private String type;
 
     @Bean
     public SingleConnectionFactory connectionFactory() {
@@ -34,7 +38,7 @@ public class JmsConfig {
                         user, password, brokerUrl
                 )
         );
-        factory.setClientId("training");
+        factory.setClientId(clientId);
         factory.setReconnectOnException(true);
         return factory;
     }
@@ -43,7 +47,7 @@ public class JmsConfig {
     public MessageConverter jacksonJmsMessageConverter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
-        converter.setTypeIdPropertyName("_type");
+        converter.setTypeIdPropertyName(type);
         return converter;
     }
 
