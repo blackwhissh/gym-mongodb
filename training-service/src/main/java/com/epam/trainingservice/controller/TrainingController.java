@@ -24,6 +24,10 @@ public class TrainingController {
     @LogEntryExit(showArgs = true, showResult = true)
     @Operation(summary = "Save Report", description = "This method is called from gym-service, " + "it saves report in database whenever new training is added or deleted")
     public ResponseEntity<HttpStatus> saveInfo(@RequestBody TrainingInfoMessage request) {
-        return trainingService.saveInfo(request);
+        boolean b = trainingService.saveInfo(request);
+        if(b){
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

@@ -27,7 +27,7 @@ public class TrainingService {
         this.workloadRepository = workloadRepository;
     }
 
-    public ResponseEntity<HttpStatus> saveInfo(TrainingInfoMessage request) {
+    public boolean saveInfo(TrainingInfoMessage request) {
         try {
             if (Arrays.stream(ActionType.values()).noneMatch(actionType ->
                     request.getActionType().equals(actionType))) {
@@ -75,10 +75,9 @@ public class TrainingService {
                         trainer.get()
                 ));
             }
-            return new ResponseEntity<>(HttpStatus.OK);
+            return true;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return false;
         }
     }
 }
