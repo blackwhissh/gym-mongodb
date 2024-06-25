@@ -27,26 +27,10 @@ public class WorkloadService {
         this.trainerRepository = trainerRepository;
     }
 
-    public ResponseEntity<TrainerSummaryByMonth> getTrainerSummaryByMonthAndYear(String username, int year, int month) {
-        Trainer trainer = trainerRepository.findByUsername(username).orElseThrow(TrainerNotFoundException::new);
-        List<Workload> workloads = workloadRepository.findByTrainerOrderByYearAsc(trainer)
-                .stream().filter(workload -> workload.getYear() == year && workload.getActionType() == ActionType.ADD)
-                .toList();
-
-        int total = 0;
-
-        for (Workload workload : workloads) {
-            if (workload.getMonth() == month) {
-                total = total + workload.getTrainingDuration();
-            }
-        }
-
-        return ResponseEntity.ok(new TrainerSummaryByMonth(month, total));
-    }
-
-    public ResponseEntity<TrainerSummary> getTrainerSummary(String username) {
+    public TrainerSummary getTrainerSummary(String username) {
         Trainer trainer = trainerRepository.findByUsername(username).orElseThrow(TrainerNotFoundException::new);
         List<Workload> workloads = workloadRepository.findByTrainerOrderByYearAsc(trainer);
+
 
         TrainerSummary summary = new TrainerSummary();
         summary.setUsername(trainer.getUsername());
@@ -59,7 +43,7 @@ public class WorkloadService {
             addWorkloadToSummary(summary, workload);
         }
 
-        return ResponseEntity.ok(summary);
+        return summary;
 
     }
 
@@ -92,4 +76,20 @@ public class WorkloadService {
     }
 
 
+    public TrainerSummaryByMonth getTrainerSummaryByMonthAndYear(String username, int year, int month) {
+        Trainer trainer = trainerRepository.findByUsername(username).orElseThrow(TrainerNotFoundException::new);
+        List<Workload> workloads = workloadRepository.findByTrainerOrderByYearAsc(trainer)
+                .stream().filter(workload -> workload.getYear() == year && workload.getActionType() == ActionType.ADD)
+                .toList();
+
+        int total = 0;
+
+        for (Workload workload : workloads) {
+            if (workload.getMonth() == month) {
+                total = total + workload.getTrainingDuration();
+            }
+        }
+
+        return new TrainerSummaryByMonth(month, total);
+    }
 }
