@@ -8,6 +8,7 @@ import com.epam.trainingservice.exception.WorkloadNotFoundException;
 import com.epam.trainingservice.repository.TrainerRepository;
 import com.epam.trainingservice.repository.WorkloadRepository;
 import com.epam.trainingservice.utils.DateUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class TrainingService {
         this.trainerRepository = trainerRepository;
         this.workloadRepository = workloadRepository;
     }
-
+    @Transactional
     public boolean updateWorkload(TrainingInfoMessage request) {
         try {
             if (Arrays.stream(ActionType.values()).noneMatch(actionType ->
