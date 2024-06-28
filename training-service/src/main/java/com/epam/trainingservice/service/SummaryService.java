@@ -19,8 +19,8 @@ public class SummaryService {
         this.workloadService = workloadService;
     }
     @LogEntryExit(showArgs = true, showResult = true)
-    public ResponseEntity<?> processByUsername(String username) {
-        TrainerSummary trainerSummary = workloadService.getTrainerSummary(username).getBody();
+    public void processByUsername(String username) {
+        TrainerSummary trainerSummary = workloadService.getTrainerSummary(username);
         Summary summary = new Summary(
                 Objects.requireNonNull(trainerSummary).getUsername(),
                 trainerSummary.getFirstName(),
@@ -30,10 +30,8 @@ public class SummaryService {
 
         if(summaryRepository.findByUsername(username) == null){
             summaryRepository.save(summary);
-            return ResponseEntity.ok("Summary has been saved");
         }else {
             summaryRepository.updateDuration(username,summary);
-            return ResponseEntity.ok("Summary has been updated");
         }
 
     }

@@ -29,7 +29,7 @@ public class TrainingInfoConsumer {
     public void receive(Message<Object> message) throws JsonProcessingException {
         TrainingInfoMessage request = objectMapper.readValue(message.getPayload().toString(), TrainingInfoMessage.class);
         log.info("Received message: " + request.toString());
-        trainingService.saveInfo(request);
+        trainingService.updateWorkload(request);
         summaryService.processByUsername(request.getUsername());
     }
 }
