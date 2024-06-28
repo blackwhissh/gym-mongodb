@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.Optional;
 
 import static com.epam.trainingservice.utils.DateUtils.*;
-
 @Service
 public class TrainingService {
     private static final Logger log = LoggerFactory.getLogger(TrainingService.class);
