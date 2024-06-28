@@ -101,7 +101,7 @@ info:
     version: 3.2.5
     java:
       version: 19.0.2
-  build-timestamp: 2024-06-22 13:53:00
+  build-timestamp: 2024-06-26 17:32:21
 ---
 spring:
   config:
@@ -116,7 +116,7 @@ info:
     version: 3.2.5
     java:
       version: 19.0.2
-  build-timestamp: 2024-06-22 13:53:00
+  build-timestamp: 2024-06-26 17:32:21
 ---
 spring:
   config:
@@ -132,11 +132,10 @@ spring:
 info:
   app:
     name: gym-service
-    description: Gym Spring Boot App with Security
     version: 3.2.5
     java:
       version: 19.0.2
-  build-timestamp: 2024-06-22 13:53:00
+  build-timestamp: 2024-06-26 17:32:21
 
 ---
 spring:

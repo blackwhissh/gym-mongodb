@@ -132,7 +132,6 @@ spring:
 info:
   app:
     name: @project.name@
-    description: @project.description@
     version: @project.version@
     java:
       version: @java.version@
