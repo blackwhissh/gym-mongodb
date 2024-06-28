@@ -1,6 +1,5 @@
 package com.epam.trainingservice.service;
 
-import com.epam.trainingservice.dto.TrainingInfoMessage;
 import com.epam.trainingservice.entity.Trainer;
 import com.epam.trainingservice.entity.Workload;
 import com.epam.trainingservice.entity.enums.ActionType;
