@@ -93,7 +93,7 @@ public class TraineeService {
         return ResponseEntity.ok().body(notAssignedTrainers.stream().map(trainer -> new NotAssignedTrainer(trainer.getUser().getUsername(), trainer.getUser().getFirstName(), trainer.getUser().getLastName(), trainer.getSpecialization())).toList());
     }
 
-    public List<Trainer> assignedTrainersList(@NotNull User currentUser, @NotNull String traineeUsername) throws AuthenticationException {
+    public List<Trainer> assignedTrainersList(@NotNull String traineeUsername){
         Trainee trainee = traineeRepository.selectByUsername(traineeUsername);
         List<Trainer> allTrainers = trainerRepository.getAllTrainers();
         List<Trainer> assignedTrainers = new ArrayList<>();
