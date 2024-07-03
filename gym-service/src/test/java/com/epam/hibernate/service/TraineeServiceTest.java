@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.sql.Date;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -152,6 +153,29 @@ class TraineeServiceTest {
         assertEquals(200, responseEntity.getStatusCode().value());
         verify(trainerRepository, times(1)).selectByUsername("trainerUsername");
     }
+
+    @Test
+    public void assignedTrainersListTest(){
+        String traineeUsername = "testTraineeUsername";
+        Trainee trainee = createMockTrainee();
+        trainee.getUser().setUsername(traineeUsername);
+
+        Trainer trainer = new Trainer();
+        trainer.setTrainees(Set.of(trainee));
+
+        List<Trainer> allTrainers = Arrays.asList(trainer);
+
+        when(traineeRepository.selectByUsername(traineeUsername)).thenReturn(trainee);
+        when(trainerRepository.getAllTrainers()).thenReturn(allTrainers);
+
+        List<Trainer> result = traineeService.assignedTrainersList(traineeUsername);
+
+        verify(traineeRepository, times(1)).selectByUsername(traineeUsername);
+        verify(trainerRepository, times(1)).getAllTrainers();
+        assertEquals(1, result.size());
+        assertEquals(trainer, result.get(0));
+    }
+
 
     private Trainee createMockTrainee() {
         Trainee mockTrainee = mock(Trainee.class);
