@@ -18,7 +18,7 @@ import java.util.Optional;
 import static com.epam.trainingservice.utils.DateUtils.*;
 @Service
 public class TrainingService {
-    private static final Logger log = LoggerFactory.getLogger(TrainingService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
     private final TrainerRepository trainerRepository;
     private final WorkloadRepository workloadRepository;
 
@@ -43,7 +43,7 @@ public class TrainingService {
             }
             return true;
         } catch (Exception e) {
-            log.error("Exception occurred during updating workload: " + e);
+            LOGGER.error("Exception occurred during updating workload: " + e);
             return false;
         }
     }
