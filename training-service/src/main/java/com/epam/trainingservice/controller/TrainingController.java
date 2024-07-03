@@ -26,8 +26,9 @@ public class TrainingController {
     public ResponseEntity<HttpStatus> saveInfo(@RequestBody TrainingInfoMessage request) {
         if(trainingService.updateWorkload(request.getUsername(), request.getFirstName(), request.getLastName(),
                 request.getActive(), request.getDuration(), request.getTrainingDate(), request.getActionType())){
+
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.valueOf(500));
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
